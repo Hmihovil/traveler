@@ -1,9 +1,12 @@
 package com.kennethatria.traveller.traveller;
 
+import android.app.DatePickerDialog;
+import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 
+import android.support.v4.app.DialogFragment;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -12,8 +15,10 @@ import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
+import android.widget.DatePicker;
 import android.widget.EditText;
 
+import android.widget.TextView;
 import android.widget.Toast;
 
 
@@ -29,6 +34,7 @@ import com.android.volley.toolbox.Volley;
 import java.text.SimpleDateFormat;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 
@@ -40,12 +46,12 @@ import org.json.simple.parser.JSONParser;
 
 
 
-public class StartActivity extends AppCompatActivity {
+public class StartActivity extends AppCompatActivity  {
 
     EditText origin_edit_view;
     EditText destination_edit_view;
-    String user_origin;
-    String user_destination;
+    TextView txtDate;
+    String user_origin, user_destination, today_date;
     Long token_valid_time;
     String token_time_last_called;
     String access_token;
@@ -56,6 +62,8 @@ public class StartActivity extends AppCompatActivity {
     public ProgressDialog progress;
     AlertDialog.Builder alertDialog;
     double origin_latitude,origin_longtitude,destination_latitude,destination_longtitude;
+    private int mYear, mMonth, mDay, mHour, mMinute;
+    Button button_date;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,6 +76,19 @@ public class StartActivity extends AppCompatActivity {
         alertDialog = new AlertDialog.Builder(StartActivity.this);
 
         maps_intent = new Intent(this, MapsActivity.class);//maps intent
+
+        /** start of date picker **/
+        txtDate = (TextView)findViewById(R.id.in_date);
+
+        button_date = (Button)findViewById(R.id.button_date);
+        button_date.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                datePicker();
+            }
+        });
+
+        /** end: date picker **/
 
         origin_edit_view = (EditText)findViewById(R.id.origins_edit_view);
         origin_edit_view.setFocusable(false);
@@ -98,13 +119,15 @@ public class StartActivity extends AppCompatActivity {
             }
         });
 
+
         Button start_map_button = findViewById(R.id.start_maps_button); // start button
         start_map_button.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
 
                 /** validators for user input **/
-
-                if(TextUtils.isEmpty(user_origin)) {
+                if(TextUtils.isEmpty(today_date)){
+                    showAlertDialogBox("Please select a valid date !!!");
+                }else if(TextUtils.isEmpty(user_origin)) {
                     showAlertDialogBox("Please select a origin !!!");
 
                     return;
@@ -139,6 +162,29 @@ public class StartActivity extends AppCompatActivity {
         });
 
     } // end of onCreate
+
+    public void datePicker(){
+        // Get Current Date
+        final Calendar c = Calendar.getInstance();
+        mYear = c.get(Calendar.YEAR);
+        mMonth = c.get(Calendar.MONTH);
+        mDay = c.get(Calendar.DAY_OF_MONTH);
+
+        DatePickerDialog datePickerDialog = new DatePickerDialog(this,
+                new DatePickerDialog.OnDateSetListener() {
+
+                    @Override
+                    public void onDateSet(DatePicker view, int year,
+                                          int monthOfYear, int dayOfMonth) {
+                        txtDate.setText(year + "-" + (monthOfYear + 1) + "-" + dayOfMonth);
+                        today_date = year + "-" + (monthOfYear + 1) + "-" + dayOfMonth;
+                        showToast(today_date);
+
+                    }
+                }, mYear, mMonth, mDay);
+        datePickerDialog.show();
+    }
+
 
     public void travelOptions(final String location){ // returns airport options and inputs in user input : origin && destination
 
@@ -243,8 +289,7 @@ public class StartActivity extends AppCompatActivity {
     public void fetchLocationFlights(){ // method returns flight logs depending on user location
 
         Date date = new Date();
-        String today_date = new SimpleDateFormat("yyyy-MM-dd").format(date);  // retrieving Today's date
-
+        //today_date = new SimpleDateFormat("yyyy-MM-dd").format(date);  // retrieving Today's date
         RequestQueue queue = Volley.newRequestQueue(this);
 
         String url = "https://api.lufthansa.com/v1/operations/schedules/"+user_origin+"/"+user_destination+"/"+today_date+"?limit=3";
