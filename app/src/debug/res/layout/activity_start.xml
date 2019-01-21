@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+
+    <LinearLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        tools:context=".StartActivity"
+        >
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/app_location_origin"
+        android:gravity="center"
+        android:layout_margin="20dp"
+        android:textSize="20dp"
+        />
+
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:layout_margin="20dp"
+        android:textSize="20dp"
+        android:focusableInTouchMode="false"
+        android:padding="5dip"
+        android:background="@drawable/rounded_editview"
+        android:id="@+id/origins_edit_view"
+        />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/app_location_destination"
+        android:gravity="center"
+        android:layout_margin="20dp"
+        android:textSize="20dp"
+        />
+
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:layout_margin="20dp"
+        android:textSize="20dp"
+        android:id="@+id/destinations_edit_view"
+        android:focusableInTouchMode="false"
+        android:padding="5dip"
+        android:background="@drawable/rounded_editview"
+        />
+
+    <Button
+        android:id="@+id/start_maps_button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Button"
+        tools:text="Start" />
+
+
+
+</LinearLayout>
