@@ -210,7 +210,6 @@ public class StartActivity extends AppCompatActivity  {
                         txtDate.setText(travel_date);
                         showToast(travel_date);// setting travel date
 
-
                     }
                 }, mYear, mMonth, mDay);
         datePickerDialog.show();
@@ -511,17 +510,7 @@ public class StartActivity extends AppCompatActivity  {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 // TODO Auto-generated method stub
-
-                alertDialog.setTitle("Flight Details");
-                alertDialog.setMessage(listItems[which].toString());
-                alertDialog.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int id) {
-                        startActivity(maps_intent);
-                    }
-                });
-                alertDialog.show();
-
-                //builder.setOnCancelListener(new );
+                showAlertDialogBox(listItems[which].toString());
             }
         });
 
@@ -538,7 +527,7 @@ public class StartActivity extends AppCompatActivity  {
                         new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface arg0, int arg1) {
-                                //Toast.makeText(StartActivity.this,"Display Ticket Details",Toast.LENGTH_LONG).show();
+
                                 }
 
                         });
