@@ -6,7 +6,10 @@ import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 
+import android.os.Handler;
+import android.os.Message;
 import android.support.v4.app.DialogFragment;
+import android.support.v4.app.NotificationCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -18,6 +21,7 @@ import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
 
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -44,6 +48,7 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 
+import static java.lang.Thread.sleep;
 
 
 public class StartActivity extends AppCompatActivity  {
@@ -51,7 +56,7 @@ public class StartActivity extends AppCompatActivity  {
     EditText origin_edit_view;
     EditText destination_edit_view;
     TextView txtDate;
-    String user_origin, user_destination, today_date;
+    String user_origin, user_destination, travel_date;
     Long token_valid_time;
     String token_time_last_called;
     String access_token;
@@ -64,6 +69,14 @@ public class StartActivity extends AppCompatActivity  {
     double origin_latitude,origin_longtitude,destination_latitude,destination_longtitude;
     private int mYear, mMonth, mDay, mHour, mMinute;
     Button button_date;
+    final int totalProgressTime = 100;
+    ProgressDialog progressDialog;
+
+
+    private ProgressBar progressBar;
+    private int progressStatus = 0;
+    private TextView textView;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -71,9 +84,6 @@ public class StartActivity extends AppCompatActivity  {
         setContentView(R.layout.activity_start);
 
         progress = new ProgressDialog(this); //  initializing progress bar
-        progress.setMessage("Loading  Details !!! ");
-
-        alertDialog = new AlertDialog.Builder(StartActivity.this);
 
         maps_intent = new Intent(this, MapsActivity.class);//maps intent
 
@@ -124,8 +134,9 @@ public class StartActivity extends AppCompatActivity  {
         start_map_button.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
 
+
                 /** validators for user input **/
-                if(TextUtils.isEmpty(today_date)){
+                if(TextUtils.isEmpty(travel_date)){
                     showAlertDialogBox("Please select a valid date !!!");
                 }else if(TextUtils.isEmpty(user_origin)) {
                     showAlertDialogBox("Please select a origin !!!");
@@ -139,7 +150,7 @@ public class StartActivity extends AppCompatActivity  {
                     showAlertDialogBox("please select another destination ");
                 }
 
-                /** end of validation **/
+                 /** end of validation **/
 
                 /** setting origin and destination latitude and longtitude **/
 
@@ -155,10 +166,14 @@ public class StartActivity extends AppCompatActivity  {
 
                 /** end **/
 
+                //showProgressCounter();
+
                 progress.show(); // show progress bar
 
                 getAccessToken(); // get api access token
             }
+
+            //
         });
 
     } // end of onCreate
@@ -176,9 +191,25 @@ public class StartActivity extends AppCompatActivity  {
                     @Override
                     public void onDateSet(DatePicker view, int year,
                                           int monthOfYear, int dayOfMonth) {
-                        txtDate.setText(year + "-" + (monthOfYear + 1) + "-" + dayOfMonth);
-                        today_date = year + "-" + (monthOfYear + 1) + "-" + dayOfMonth;
-                        showToast(today_date);
+                        //txtDate.setText(year + "-" + (monthOfYear + 1) + "-" + dayOfMonth);
+
+                        String month = "";
+                        String date_today = "";
+                        if((monthOfYear + 1) < 10){
+                            month = "0"+(monthOfYear + 1);
+                        }else{
+                            month = getString(monthOfYear + 1);
+                        }
+                        if(dayOfMonth < 10){
+                            date_today = "0"+dayOfMonth;
+                        }else{
+                            date_today = Integer.toString(dayOfMonth);
+                        }
+
+                        travel_date = year + "-" + month + "-" + date_today;
+                        txtDate.setText(travel_date);
+                        showToast(travel_date);// setting travel date
+
 
                     }
                 }, mYear, mMonth, mDay);
@@ -257,8 +288,9 @@ public class StartActivity extends AppCompatActivity  {
                             fetchLocationFlights(); // call to fetch Location Flights method
 
                         }catch(Exception e){
-                            progress.dismiss();
-                            Log.e("Error:", e.toString());
+                            if(progress != null && progress.isShowing()){
+                                progress.hide();
+                            }
                             Toast.makeText(StartActivity.this,"Error: receiving token !!! : "+e.toString(),Toast.LENGTH_LONG).show();
                         }
                     }
@@ -267,9 +299,9 @@ public class StartActivity extends AppCompatActivity  {
                 {
                     @Override
                     public void onErrorResponse(VolleyError error) {
+                        //showProgressCounter(10);
                         progress.dismiss();
-                        //Toast.makeText(StartActivity.this,error.toString(),Toast.LENGTH_LONG).show();
-                        showAlertDialogBox("token : "+error.toString());
+                        showAlertDialogBox("Token : Contact Administrator \n ______________________________ \n"+error.toString());
                     }
                 }
         ) {
@@ -288,11 +320,9 @@ public class StartActivity extends AppCompatActivity  {
 
     public void fetchLocationFlights(){ // method returns flight logs depending on user location
 
-        Date date = new Date();
-        //today_date = new SimpleDateFormat("yyyy-MM-dd").format(date);  // retrieving Today's date
         RequestQueue queue = Volley.newRequestQueue(this);
 
-        String url = "https://api.lufthansa.com/v1/operations/schedules/"+user_origin+"/"+user_destination+"/"+today_date+"?limit=3";
+        String url = "https://api.lufthansa.com/v1/operations/schedules/"+user_origin+"/"+user_destination+"/"+travel_date+"?limit=3";
 
         StringRequest postRequest = new StringRequest(Request.Method.GET, url,
                 new Response.Listener<String>()
@@ -302,6 +332,10 @@ public class StartActivity extends AppCompatActivity  {
 
                         JSONParser parser = new JSONParser();
                         try{
+
+                            if(progress != null && progress.isShowing()){
+                                progress.hide();
+                            }
 
                             Object obj = parser.parse(response);
                             JSONObject jsonObject = (JSONObject)obj;
@@ -397,9 +431,10 @@ public class StartActivity extends AppCompatActivity  {
                     @Override
                     public void onErrorResponse(VolleyError error) {
                         // display error code
+                        //showProgressCounter(3);
                         progress.dismiss();
                         //Toast.makeText(StartActivity.this,"Flight details error : " +error.toString(),Toast.LENGTH_LONG).show();
-                        showAlertDialogBox("token: "+error.toString());
+                        showAlertDialogBox("API response 401 : Contact Administrator \n "+error.toString());
                     }
                 }
         ) {
@@ -499,7 +534,7 @@ public class StartActivity extends AppCompatActivity  {
 
         final AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
         alertDialogBuilder.setMessage(message);
-                alertDialogBuilder.setPositiveButton("Yes",
+                alertDialogBuilder.setPositiveButton("Ok",
                         new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface arg0, int arg1) {
@@ -520,7 +555,40 @@ public class StartActivity extends AppCompatActivity  {
 
     }
 
-    public void dialogProgressCounter() { // increments counter while dialog progress is running
+    public void showProgressCounter() { // increments counter while dialog progress is running
+
+        final Handler handle = new Handler() {
+            @Override
+            public void handleMessage(Message msg) {
+                super.handleMessage(msg);
+                progress.incrementProgressBy(1);
+            }
+        };
+
+        progress.setMax(100);
+        progress.setTitle("Loading");
+        progress.setMessage("Fetching Flight details ... ");
+        progress.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+        progress.show();
+
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    while (progress.getProgress() <= progress
+                            .getMax()) {
+                        Thread.sleep(50);
+                        handle.sendMessage(handle.obtainMessage());
+                        if (progress.getProgress() == progress
+                                .getMax()) {
+                            progress.dismiss();
+                        }
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        }).start();
 
 
     }
@@ -528,6 +596,8 @@ public class StartActivity extends AppCompatActivity  {
     public void showToast(String msg){ //used for debugging only
         Toast.makeText(StartActivity.this,msg,Toast.LENGTH_LONG).show();
     }
+
+
 
 
 
