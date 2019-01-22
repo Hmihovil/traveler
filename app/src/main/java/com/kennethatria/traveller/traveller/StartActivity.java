@@ -366,7 +366,6 @@ public class StartActivity extends AppCompatActivity  {
                                     String Arrival_obj_datetime = (String) Arrival_obj_schedulted_time.get("DateTime");
                                     String Arrival_obj_airport = Departure_obj.get("AirportCode").toString();
 
-                                    Log.e("test", Arrival_obj_datetime + " "+  Arrival_obj_airport );
 
                                     /** end of arrival details json object**/
 
@@ -378,8 +377,6 @@ public class StartActivity extends AppCompatActivity  {
                                     showListDialogBox(options);
 
                                 }else if(flight_obj instanceof  JSONArray){
-
-                                    Log.e("test - a",flight_obj.getClass().toString());
 
                                     JSONArray jsonObject_flight_details = (JSONArray) flight_obj;
 
@@ -510,7 +507,7 @@ public class StartActivity extends AppCompatActivity  {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 // TODO Auto-generated method stub
-                showAlertDialogBox(listItems[which].toString());
+                showDetialsDialogBox((listItems[which].toString()));
             }
         });
 
@@ -532,12 +529,23 @@ public class StartActivity extends AppCompatActivity  {
 
                         });
 
-        /**alertDialogBuilder.setNegativeButton("No",new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                finish();
-            }
-        });**/
+        AlertDialog alertDialog = alertDialogBuilder.create();
+        alertDialog.show();
+
+    }
+
+    public void showDetialsDialogBox(String message){ // displays messages to users
+        final AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
+        alertDialogBuilder.setMessage(message);
+        alertDialogBuilder.setPositiveButton("Ok",
+                new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface arg0, int arg1) {
+                        startActivity(maps_intent);
+                        // clear user detials
+                    }
+
+                });
 
         AlertDialog alertDialog = alertDialogBuilder.create();
         alertDialog.show();
