@@ -3,8 +3,8 @@
     <string name="title_activity_maps">Map</string>
     <string name="app_location_origin">Enter Origin</string>
     <string name="app_location_destination">Enter Destination </string>
-    <string name="client_id">wcpc47fmq3c2usy5yu9z7gsw</string>
-    <string name="client_secret">y8qyPVYJQV</string>
+    <string name="client_id"> </string>
+    <string name="client_secret"> </string>
     <string name="grant_type">client_credentials</string>
     <string name="time_string"> Choose </string>
 </resources>
