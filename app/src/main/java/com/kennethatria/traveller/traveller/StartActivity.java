@@ -8,8 +8,7 @@ import android.content.Intent;
 
 import android.os.Handler;
 import android.os.Message;
-import android.support.v4.app.DialogFragment;
-import android.support.v4.app.NotificationCompat;
+
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -35,11 +34,8 @@ import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 
 
-import java.text.SimpleDateFormat;
-
-import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Date;
+
 import java.util.HashMap;
 
 import java.util.Map;
@@ -48,7 +44,6 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 
-import static java.lang.Thread.sleep;
 
 
 public class StartActivity extends AppCompatActivity  {
@@ -69,13 +64,7 @@ public class StartActivity extends AppCompatActivity  {
     double origin_latitude,origin_longtitude,destination_latitude,destination_longtitude;
     private int mYear, mMonth, mDay, mHour, mMinute;
     Button button_date;
-    final int totalProgressTime = 100;
-    ProgressDialog progressDialog;
 
-
-    private ProgressBar progressBar;
-    private int progressStatus = 0;
-    private TextView textView;
 
 
     @Override
@@ -140,12 +129,8 @@ public class StartActivity extends AppCompatActivity  {
                     showAlertDialogBox("Please select a valid date !!!");
                 }else if(TextUtils.isEmpty(user_origin)) {
                     showAlertDialogBox("Please select a origin !!!");
-
-                    return;
                 }else if(TextUtils.isEmpty(user_destination)){
                     showAlertDialogBox("Please select a destination !!!");
-
-                    return;
                 }else if(user_origin.equals(user_destination)){
                     showAlertDialogBox("please select another destination ");
                 }
@@ -166,9 +151,7 @@ public class StartActivity extends AppCompatActivity  {
 
                 /** end **/
 
-                //showProgressCounter();
-
-                progress.show(); // show progress bar
+                showProgressCounter();
 
                 getAccessToken(); // get api access token
             }
@@ -191,7 +174,6 @@ public class StartActivity extends AppCompatActivity  {
                     @Override
                     public void onDateSet(DatePicker view, int year,
                                           int monthOfYear, int dayOfMonth) {
-                        //txtDate.setText(year + "-" + (monthOfYear + 1) + "-" + dayOfMonth);
 
                         String month = "";
                         String date_today = "";
@@ -206,15 +188,13 @@ public class StartActivity extends AppCompatActivity  {
                             date_today = Integer.toString(dayOfMonth);
                         }
 
-                        travel_date = year + "-" + month + "-" + date_today;
+                        travel_date = year + "-" + month + "-" + date_today; // setting travel date
                         txtDate.setText(travel_date);
-                        showToast(travel_date);// setting travel date
 
                     }
                 }, mYear, mMonth, mDay);
         datePickerDialog.show();
     }
-
 
     public void travelOptions(final String location){ // returns airport options and inputs in user input : origin && destination
 
@@ -229,19 +209,15 @@ public class StartActivity extends AppCompatActivity  {
                 if(location=="origin"){
                     origin_edit_view.setText(countries[which]);
                     user_origin = getCountryCodes(countries[which].toString());
-                    //Toast.makeText(StartActivity.this,getCountryCodes(countries[which].toString()),Toast.LENGTH_LONG).show();
                 }else if(location=="destination"){
                     destination_edit_view.setText(countries[which]);
                     user_destination = getCountryCodes(countries[which].toString());
-                   // Toast.makeText(StartActivity.this,getCountryCodes(countries[which].toString()),Toast.LENGTH_LONG).show();
                 }
             }
         });
 
         builder.show();
     }// end of travel options
-
-
 
     public String getCountryCodes(String country){  // returns country airport codes: IATA
         switch(country) {
@@ -402,10 +378,9 @@ public class StartActivity extends AppCompatActivity  {
                                         /** end of flight arrival details **/
 
                                         String flight_options = "Airport: "+getAirportName(Departure_obj_airport) + "\nDeparture: "+Departure_obj_DateTime // saves string
-                                        + "\nArrival:" + Arrival_obj_DateTime + "\n____________________";
+                                        + "\n Arrival:"+ user_destination+ " "+ Arrival_obj_DateTime + "\n____________________";
 
                                         options[i]=flight_options;
-
                                     }
                                     showListDialogBox(options);
 
@@ -414,7 +389,9 @@ public class StartActivity extends AppCompatActivity  {
                                     Log.e("message","unknown object");
                                 }
                             }
-                            progress.dismiss(); // hide progress bar
+                            if(progress != null && progress.isShowing()){
+                                progress.hide();
+                            } // hide progress bar
 
                         }catch(Exception e){
                             Log.d("error",e.toString());
@@ -428,7 +405,9 @@ public class StartActivity extends AppCompatActivity  {
                     public void onErrorResponse(VolleyError error) {
                         // display error code
                         //showProgressCounter(3);
-                        progress.dismiss();
+                        if(progress != null && progress.isShowing()){
+                            progress.hide();
+                        }
                         //Toast.makeText(StartActivity.this,"Flight details error : " +error.toString(),Toast.LENGTH_LONG).show();
                         showAlertDialogBox("API response 401 : Contact Administrator \n "+error.toString());
                     }
