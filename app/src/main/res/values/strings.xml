@@ -6,6 +6,5 @@
     <string name="client_id">wcpc47fmq3c2usy5yu9z7gsw</string>
     <string name="client_secret">y8qyPVYJQV</string>
     <string name="grant_type">client_credentials</string>
-    <string name="time_string">Pick a date </string>
-
+    <string name="time_string"> Choose </string>
 </resources>
