@@ -31,7 +31,7 @@
             android:gravity="center"
             android:background="@drawable/rounded_editview"/>
         <Button
-            android:layout_width="50dp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/time_string"
             android:id="@+id/button_date" />
