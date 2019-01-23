@@ -345,8 +345,8 @@ public class StartActivity extends AppCompatActivity  {
 
                                     /** end of arrival details json object**/
 
-                                    String flight_options = "Airport: "+getAirportName(departure_airport) + "\nDeparture: "+departure_datetime // saves string
-                                    + "\nArrival:" + Arrival_obj_datetime + "\n____________________";
+                                    String flight_options = "Airport: "+ user_origin + "\nDeparture: "+departure_datetime // saves string
+                                    + "\nArrival:" + user_destination +" Time: " + Arrival_obj_datetime + "\n________________________________________";
                                     String[] options = new String[1];
                                     options[0]=flight_options;
 
@@ -377,8 +377,8 @@ public class StartActivity extends AppCompatActivity  {
 
                                         /** end of flight arrival details **/
 
-                                        String flight_options = "Airport: "+getAirportName(Departure_obj_airport) + "\nDeparture: "+Departure_obj_DateTime // saves string
-                                        + "\n Arrival:"+ user_destination+ " "+ Arrival_obj_DateTime + "\n____________________";
+                                        String flight_options = "Airport: "+ user_origin + "\nDeparture: "+Departure_obj_DateTime // saves string
+                                        + "\n Arrival:"+ user_destination+ " Time: "+ Arrival_obj_DateTime + "\n________________________________________";
 
                                         options[i]=flight_options;
                                     }
